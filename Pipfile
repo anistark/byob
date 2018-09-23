@@ -8,5 +8,5 @@ python_version = "3.6"
 
 [packages]
 pyfiglet = "==0.7.5"
-flask = "==0.12.2"
+flask = "==0.12.3"
 requests = "==2.18.4"
