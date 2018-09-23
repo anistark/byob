@@ -9,50 +9,50 @@ class Blockchain:
         self.nodes = set()
         self.chain = []
         self.all_transactions = []
-        self.new_block(previous_block_hash='1', signature=100)
+        self.create_block(previous_block_hash='1', signature=100)
 
-    def new_block(self, signature, previous_block_hash):
+    def create_block(self, signature, previous_block_hash):
         block = {
             'index': len(self.chain) + 1,
             'timestamp': time(),
             'transactions': self.all_transactions,
             'signature': signature,
-            'previous_block_hash': previous_block_hash or self.hash(self.chain[-1]),
+            'previous_block_hash': previous_block_hash or self.get_hash(self.chain[-1]),
         }
         self.all_transactions = []
         self.chain.append(block)
         return block
 
-    def new_transaction(self, sender, recipient, amount):
+    def create_transaction(self, sender, recipient, amount):
         self.all_transactions.append({
             'sender': sender,
             'recipient': recipient,
             'amount': amount,
         })
-        return self.last_block['index'] + 1
+        return self.previous_block['index'] + 1
 
     @property
-    def last_block(self):
+    def previous_block(self):
         return self.chain[-1]
 
     @staticmethod
-    def hash(block):
+    def get_hash(block):
         block_string = json.dumps(block, sort_keys=True).encode()
         return hashlib.sha256(block_string).hexdigest()
 
-    def proof_of_work(self, last_block):
-        last_proof = last_block['signature']
-        last_hash = self.hash(last_block)
+    def pow(self, previous_block):
+        previous_signature = previous_block['signature']
+        previous_hash = self.get_hash(previous_block)
         signature = 0
-        while self.valid_proof(last_proof, signature, last_hash) is False:
+        while self.validate(previous_signature, signature, previous_hash) is False:
             signature += 1
         return signature
 
     @staticmethod
-    def valid_proof(last_proof, signature, last_hash):
-        guess = f'{last_proof}{signature}{last_hash}'.encode()
-        guess_hash = hashlib.sha256(guess).hexdigest()
-        return guess_hash[:4] == "0000"
+    def validate(previous_signature, signature, previous_hash):
+        encoded_signature = f'{previous_signature}{signature}{previous_hash}'.encode()
+        signature_hash = hashlib.sha256(encoded_signature).hexdigest()
+        return signature_hash[:4] == "0000"
 
 
 app = Flask(__name__)
@@ -63,15 +63,15 @@ blockchain = Blockchain()
 
 @app.route('/mine', methods=['GET'])
 def mine():
-    last_block = blockchain.last_block
-    signature = blockchain.proof_of_work(last_block)
-    blockchain.new_transaction(
+    previous_block = blockchain.previous_block
+    signature = blockchain.pow(previous_block)
+    blockchain.create_transaction(
         sender="0",
         recipient=node_address,
         amount=1,
     )
-    previous_block_hash = blockchain.hash(last_block)
-    block = blockchain.new_block(signature, previous_block_hash)
+    previous_block_hash = blockchain.get_hash(previous_block)
+    block = blockchain.create_block(signature, previous_block_hash)
     response_data = {
         'message': "Mined a new block!",
         'index': block['index'],
