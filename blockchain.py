@@ -94,6 +94,10 @@ def home():
     return "Welcome to Building Your Own Blockchain!<br><br>Go to <a href='/chain'>/chain</a> url..", 200
 
 if __name__ == '__main__':
+    print('\x1bc')
+    from pyfiglet import Figlet
+    f = Figlet(font='train')
+    print(f.renderText('BYOB'))
     from argparse import ArgumentParser
     argp = ArgumentParser()
     argp.add_argument('-p', '--port', default=8000, type=int, help='port for server to listen')
