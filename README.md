@@ -22,4 +22,4 @@ $ pipenv install
 (Default port is `8000`)
 * Node 1: `pipenv run python blockchain.py`
 * Node 2: `pipenv run python blockchain.py -p 8001`
-* Node 3: `pipenv run python blockchain.py --port 8002`
+* Node 3: `pipenv run python blockchain.py -p 8002`
