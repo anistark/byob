@@ -9,4 +9,4 @@ python_version = "3.6"
 [packages]
 pyfiglet = "==0.7.5"
 flask = "==1.0"
-requests = "==2.18.4"
+requests = "==2.20.0"
